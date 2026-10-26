@@ -42,7 +42,13 @@ def health_check():
         "status": "online",
         "nasa_firms_configured": bool(firms_service.map_key),
         "mobilenet_loaded": inference_service.model is not None,
-        "historical_records_loaded": len(historical_service.df) if historical_service.df is not None else 0
+        "mobilenet_path": str(inference_service.model_path),
+        "mobilenet_path_exists": inference_service.model_path.exists(),
+        "mobilenet_error": getattr(inference_service, "load_error", None),
+        "historical_records_loaded": len(historical_service.df) if historical_service.df is not None else 0,
+        "historical_dir": str(historical_service.data_dir),
+        "historical_dir_exists": historical_service.data_dir.exists(),
+        "cwd": str(Path.cwd())
     }
 
 # ==========================================

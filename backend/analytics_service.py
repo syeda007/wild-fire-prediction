@@ -2,12 +2,22 @@ import os
 import json
 from pathlib import Path
 from typing import Dict, Any, Optional
-BASE_DIR = Path(__file__).resolve().parent.parent
-METRICS_PATH = Path(os.getenv("METRICS_PATH", BASE_DIR / "models" / "metrics.json"))
+def find_metrics_path() -> Path:
+    candidates = [
+        Path(os.getenv("METRICS_PATH", "")) if os.getenv("METRICS_PATH") else None,
+        Path(__file__).resolve().parent / "models" / "metrics.json",
+        Path(__file__).resolve().parent.parent / "models" / "metrics.json",
+        Path.cwd() / "models" / "metrics.json",
+        Path.cwd() / "backend" / "models" / "metrics.json",
+    ]
+    for c in candidates:
+        if c and c.is_file():
+            return c
+    return Path(__file__).resolve().parent / "models" / "metrics.json"
 
 class AnalyticsService:
     def __init__(self, metrics_path: Optional[str] = None):
-        self.metrics_path = Path(metrics_path) if metrics_path else METRICS_PATH
+        self.metrics_path = Path(metrics_path) if metrics_path else find_metrics_path()
 
     def get_model_evaluation(self) -> Dict[str, Any]:
         if not self.metrics_path.exists():

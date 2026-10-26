@@ -1,0 +1,114 @@
+{
+  "dataset_metadata": {
+    "source": "Wildfire Prediction Dataset (Satellite Images)",
+    "classes": [
+      "nowildfire",
+      "wildfire"
+    ],
+    "total_images": 42850,
+    "train_samples_used": 1200,
+    "val_samples_used": 400,
+    "test_samples_used": 500,
+    "image_resolution": "350x350 rescaled to 224x224",
+    "semantic_definition": "Labels represent satellite optical imagery centered over historical wildfire-affected / burn-scarred terrain vs. unburned reference zones. Inferences indicate optical wildfire landscape features rather than instant thermal flame detection."
+  },
+  "models_comparison": {
+    "Baseline_CNN": {
+      "name": "Custom 4-Layer CNN",
+      "test_accuracy": 0.916,
+      "precision": 0.916,
+      "recall": 0.916,
+      "f1_score": 0.916,
+      "roc_auc": 0.9699,
+      "pr_auc": 0.9677,
+      "optimal_threshold": 0.4088,
+      "confusion_matrix": [
+        [
+          229,
+          21
+        ],
+        [
+          21,
+          229
+        ]
+      ],
+      "training_history": {
+        "train_loss": [
+          0.3072,
+          0.278
+        ],
+        "train_acc": [
+          0.8883,
+          0.8883
+        ],
+        "val_loss": [
+          0.2595,
+          0.2033
+        ],
+        "val_acc": [
+          0.88,
+          0.9225
+        ],
+        "val_f1": [
+          0.8852,
+          0.9235
+        ]
+      }
+    },
+    "MobileNetV2": {
+      "name": "MobileNetV2 (Pretrained ImageNet + Fine-tuned)",
+      "test_accuracy": 0.936,
+      "precision": 0.958,
+      "recall": 0.912,
+      "f1_score": 0.9344,
+      "roc_auc": 0.9908,
+      "pr_auc": 0.9912,
+      "optimal_threshold": 0.1609,
+      "confusion_matrix": [
+        [
+          240,
+          10
+        ],
+        [
+          22,
+          228
+        ]
+      ],
+      "training_history": {
+        "train_loss": [
+          0.3573
+        ],
+        "train_acc": [
+          0.8542
+        ],
+        "val_loss": [
+          0.1427
+        ],
+        "val_acc": [
+          0.935
+        ],
+        "val_f1": [
+          0.9337
+        ]
+      }
+    }
+  },
+  "training_timestamp": "2026-10-26 08:53:01 UTC",
+  "hyperparameters": {
+    "epochs": 2,
+    "batch_size": 32,
+    "optimizer": "AdamW",
+    "loss_function": "CrossEntropyLoss",
+    "input_resolution": [
+      224,
+      224,
+      3
+    ],
+    "data_augmentation": [
+      "RandomHorizontalFlip",
+      "RandomVerticalFlip",
+      "RandomRotation(15)",
+      "ColorJitter"
+    ]
+  }
+}

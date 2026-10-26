@@ -5,17 +5,24 @@ import threading
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 import pandas as pd
-BASE_DIR = Path(__file__).resolve().parent.parent
-HISTORICAL_DATA_DIR = Path(os.getenv("HISTORICAL_DATA_DIR", BASE_DIR / "data" / "historical"))
-CACHE_FILE = HISTORICAL_DATA_DIR / "archive_processed.pkl"
-
-# Quebec bounding box
-QUEBEC_BBOX = {"min_lon": -80.0, "max_lon": -57.0, "min_lat": 45.0, "max_lat": 58.0}
+def find_historical_data_dir() -> Path:
+    candidates = [
+        Path(os.getenv("HISTORICAL_DATA_DIR", "")) if os.getenv("HISTORICAL_DATA_DIR") else None,
+        Path(__file__).resolve().parent / "data" / "historical",
+        Path(__file__).resolve().parent.parent / "data" / "historical",
+        Path.cwd() / "data" / "historical",
+        Path.cwd() / "backend" / "data" / "historical",
+    ]
+    for c in candidates:
+        if c and c.is_dir():
+            return c
+    return Path(__file__).resolve().parent / "data" / "historical"
 
 class HistoricalReplayService:
     def __init__(self, data_dir: Optional[str] = None):
-        self.data_dir = Path(data_dir) if data_dir else HISTORICAL_DATA_DIR
+        self.data_dir = Path(data_dir) if data_dir else find_historical_data_dir()
         self.data_dir.mkdir(parents=True, exist_ok=True)
+        self.cache_file = self.data_dir / "archive_processed.pkl"
         self.df: Optional[pd.DataFrame] = None
         self.current_filename: Optional[str] = None
         self.daily_summary_cache: Optional[List[Dict[str, Any]]] = None
@@ -33,10 +40,10 @@ class HistoricalReplayService:
         self.is_loading = True
         
         # Check if preprocessed pickle exists for instant loading (< 0.5s)
-        if CACHE_FILE.exists():
+        if self.cache_file.exists():
             try:
                 t0 = time.time()
-                cached = pd.read_pickle(CACHE_FILE)
+                cached = pd.read_pickle(self.cache_file)
                 self.df = cached["df"]
                 self.current_filename = cached["filename"]
                 self.distinct_dates = cached["distinct_dates"]
@@ -136,8 +143,8 @@ class HistoricalReplayService:
                 "filename": self.current_filename,
                 "distinct_dates": self.distinct_dates,
                 "daily_summary": self.daily_summary_cache
-            }, CACHE_FILE)
-            print(f"[HistoricalReplayService] Saved preprocessed cache to {CACHE_FILE}", flush=True)
+            }, self.cache_file)
+            print(f"[HistoricalReplayService] Saved preprocessed cache to {self.cache_file}", flush=True)
         except Exception as err:
             print(f"[HistoricalReplayService] Cache save notice: {err}", flush=True)
 

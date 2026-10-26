@@ -9,20 +9,40 @@ import torch
 import torch.nn.functional as F
 from torchvision import transforms
 
-# Imports from ml
+# Ensure ml module can be imported whether running from repo root or backend/
 import sys
-sys.path.append(str(Path(__file__).parent.parent / "ml"))
+for p in [
+    Path(__file__).resolve().parent / "ml",
+    Path(__file__).resolve().parent.parent / "ml",
+    Path.cwd() / "ml",
+    Path.cwd() / "backend" / "ml",
+]:
+    if p.is_dir() and str(p) not in sys.path:
+        sys.path.insert(0, str(p))
+
 from models import MobileNetV2Wildfire
 from gradcam import GradCAM
-BASE_DIR = Path(__file__).resolve().parent.parent
-MODEL_PATH = Path(os.getenv("MODEL_PATH", BASE_DIR / "models" / "mobilenetv2_wildfire.pt"))
+
+def find_model_path() -> Path:
+    candidates = [
+        Path(os.getenv("MODEL_PATH", "")) if os.getenv("MODEL_PATH") else None,
+        Path(__file__).resolve().parent / "models" / "mobilenetv2_wildfire.pt",
+        Path(__file__).resolve().parent.parent / "models" / "mobilenetv2_wildfire.pt",
+        Path.cwd() / "models" / "mobilenetv2_wildfire.pt",
+        Path.cwd() / "backend" / "models" / "mobilenetv2_wildfire.pt",
+    ]
+    for c in candidates:
+        if c and c.is_file():
+            return c
+    return Path(__file__).resolve().parent / "models" / "mobilenetv2_wildfire.pt"
 
 class InferenceService:
     def __init__(self, model_path: Optional[str] = None):
-        self.model_path = Path(model_path) if model_path else MODEL_PATH
+        self.model_path = Path(model_path) if model_path else find_model_path()
         self.device = torch.device("cpu")
         self.model: Optional[MobileNetV2Wildfire] = None
         self.grad_cam: Optional[GradCAM] = None
+        self.load_error: Optional[str] = None
         self.classes = ["Reference Unburned Zone", "Wildfire-Associated Satellite Terrain"]
         self.optimal_threshold = 0.50
         
@@ -35,8 +55,13 @@ class InferenceService:
         self.load_model()
 
     def load_model(self):
+        # Refresh model path in case files were initialized post-startup
         if not self.model_path.exists():
-            print(f"Model checkpoint not found at {self.model_path}. Will load once trained.")
+            self.model_path = find_model_path()
+
+        if not self.model_path.exists():
+            self.load_error = f"Model checkpoint not found. Looked at: {self.model_path}"
+            print(f"[InferenceService] {self.load_error}")
             return
 
         try:
@@ -52,17 +77,20 @@ class InferenceService:
             
             val_metrics = checkpoint.get("val_metrics", {})
             self.optimal_threshold = val_metrics.get("optimal_threshold", 0.50)
+            self.load_error = None
             print(f"Successfully loaded MobileNetV2 checkpoint from {self.model_path} (Optimal Threshold: {self.optimal_threshold})")
         except Exception as e:
-            print(f"Error loading model: {e}")
+            self.load_error = f"Error loading model: {str(e)}"
+            print(f"[InferenceService] {self.load_error}")
 
     def predict(self, image_bytes: bytes) -> Dict[str, Any]:
         if self.model is None:
             self.load_model()
             if self.model is None:
+                err_msg = self.load_error or "Trained MobileNetV2 model is not yet loaded. Please wait for model training to finalize."
                 return {
                     "success": False,
-                    "error": "Trained MobileNetV2 model is not yet loaded. Please wait for model training to finalize."
+                    "error": f"Model load failed: {err_msg} (checked path: {self.model_path})"
                 }
 
         t_start = time.time()
