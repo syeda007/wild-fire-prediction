@@ -1,0 +1,73 @@
+{
+  "stats": {
+    "splits": {
+      "test": {
+        "nowildfire": 2820,
+        "wildfire": 3480
+      },
+      "train": {
+        "nowildfire": 14500,
+        "wildfire": 15750
+      },
+      "valid": {
+        "nowildfire": 2820,
+        "wildfire": 3480
+      }
+    },
+    "total_images": 42850,
+    "class_counts": {
+      "nowildfire": 20140,
+      "wildfire": 22710
+    },
+    "formats": {
+      "JPEG_RGB": 42850
+    },
+    "dimensions": {
+      "(350, 350)": 42850
+    },
+    "corrupted_images": [],
+    "duplicate_hash_count": 34
+  },
+  "sample_duplicates": [
+    [
+      "D:\\dataset\\train\\nowildfire\\-73.496268,45.53714.jpg",
+      "D:\\dataset\\train\\nowildfire\\-73.496254,45.537143.jpg"
+    ],
+    [
+      "D:\\dataset\\train\\nowildfire\\-79.247944,43.631559.jpg",
+      "D:\\dataset\\train\\nowildfire\\-79.245835,43.659079.jpg"
+    ],
+    [
+      "D:\\dataset\\train\\nowildfire\\-79.248264,43.644983.jpg",
+      "D:\\dataset\\train\\nowildfire\\-79.245835,43.659079.jpg"
+    ],
+    [
+      "D:\\dataset\\train\\nowildfire\\-79.249451,43.645237.jpg",
+      "D:\\dataset\\train\\nowildfire\\-79.245835,43.659079.jpg"
+    ],
+    [
+      "D:\\dataset\\train\\nowildfire\\-79.250691,43.647078.jpg",
+      "D:\\dataset\\train\\nowildfire\\-79.245835,43.659079.jpg"
+    ],
+    [
+      "D:\\dataset\\train\\nowildfire\\-79.251147,43.64315.jpg",
+      "D:\\dataset\\train\\nowildfire\\-79.245835,43.659079.jpg"
+    ],
+    [
+      "D:\\dataset\\train\\nowildfire\\-79.253095,43.638306.jpg",
+      "D:\\dataset\\train\\nowildfire\\-79.245835,43.659079.jpg"
+    ],
+    [
+      "D:\\dataset\\train\\nowildfire\\-79.254833,43.652737.jpg",
+      "D:\\dataset\\train\\nowildfire\\-79.245835,43.659079.jpg"
+    ],
+    [
+      "D:\\dataset\\train\\nowildfire\\-79.256071,43.63371.jpg",
+      "D:\\dataset\\train\\nowildfire\\-79.245835,43.659079.jpg"
+    ],
+    [
+      "D:\\dataset\\train\\nowildfire\\-79.257722,43.638835.jpg",
+      "D:\\dataset\\train\\nowildfire\\-79.245835,43.659079.jpg"
+    ]
+  ]
+}
