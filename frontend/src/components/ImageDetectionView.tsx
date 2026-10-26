@@ -63,6 +63,18 @@ export const ImageDetectionView: React.FC = () => {
         body: formData
       });
 
+      if (!res.ok) {
+        let errorDetail = `Server returned HTTP ${res.status}`;
+        try {
+          const errJson = await res.json();
+          if (errJson.detail) errorDetail = errJson.detail;
+          else if (errJson.error) errorDetail = errJson.error;
+        } catch {
+          // ignore non-json error responses
+        }
+        throw new Error(errorDetail);
+      }
+
       const json: PredictionResponse = await res.json();
       if (!json.success && json.error) {
         setError(json.error);
