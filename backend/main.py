@@ -123,7 +123,8 @@ def get_model_evaluation():
 
 @app.get("/api/analytics/training-curves-image")
 def get_training_curves_image():
-    curves_path = Path("D:/PBA/models/training_curves.png")
+    base_dir = Path(__file__).resolve().parent.parent
+    curves_path = base_dir / "models" / "training_curves.png"
     if not curves_path.exists():
         raise HTTPException(status_code=404, detail="Training curves chart not yet generated.")
     return FileResponse(str(curves_path), media_type="image/png")

@@ -14,8 +14,8 @@ import sys
 sys.path.append(str(Path(__file__).parent.parent / "ml"))
 from models import MobileNetV2Wildfire
 from gradcam import GradCAM
-
-MODEL_PATH = Path("D:/PBA/models/mobilenetv2_wildfire.pt")
+BASE_DIR = Path(__file__).resolve().parent.parent
+MODEL_PATH = Path(os.getenv("MODEL_PATH", BASE_DIR / "models" / "mobilenetv2_wildfire.pt"))
 
 class InferenceService:
     def __init__(self, model_path: Optional[str] = None):

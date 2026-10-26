@@ -2,8 +2,8 @@ import os
 import json
 from pathlib import Path
 from typing import Dict, Any, Optional
-
-METRICS_PATH = Path("D:/PBA/models/metrics.json")
+BASE_DIR = Path(__file__).resolve().parent.parent
+METRICS_PATH = Path(os.getenv("METRICS_PATH", BASE_DIR / "models" / "metrics.json"))
 
 class AnalyticsService:
     def __init__(self, metrics_path: Optional[str] = None):

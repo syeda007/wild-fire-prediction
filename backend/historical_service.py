@@ -5,8 +5,8 @@ import threading
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 import pandas as pd
-
-HISTORICAL_DATA_DIR = Path("D:/PBA/data/historical")
+BASE_DIR = Path(__file__).resolve().parent.parent
+HISTORICAL_DATA_DIR = Path(os.getenv("HISTORICAL_DATA_DIR", BASE_DIR / "data" / "historical"))
 CACHE_FILE = HISTORICAL_DATA_DIR / "archive_processed.pkl"
 
 # Quebec bounding box
